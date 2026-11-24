@@ -1,5 +1,5 @@
 // Configuración central de ¡Aventura Retro 1930!
-export const APP_VERSION = '1.0.0';
+export const APP_VERSION = '1.0.1';
 export const GITHUB_REPO = 'waventura/miniJuegoRetro1930';
 
 export const STAGE_W = 1340;

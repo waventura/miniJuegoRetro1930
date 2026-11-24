@@ -3,9 +3,9 @@
   "appName": "¡Aventura Retro 1930!",
   "webDir": "www",
   "android": {
-    "allowMixedContent": true,
+    "allowMixedContent": false,
     "backgroundColor": "#1c1612",
-    "webContentsDebuggingEnabled": true
+    "webContentsDebuggingEnabled": false
   },
   "server": {
     "androidScheme": "https"
