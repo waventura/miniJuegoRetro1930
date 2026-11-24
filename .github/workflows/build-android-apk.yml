@@ -1,0 +1,87 @@
+name: Build Android APK & Release
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Setup Java 21 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Setup Gradle caching
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Install dependencies & verify JS
+        run: |
+          npm ci || npm install
+          npm run check
+
+      - name: Read app version
+        id: ver
+        run: |
+          PKG_VER=$(node -p "require('./package.json').version")
+          if [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
+            APP_VER="${GITHUB_REF#refs/tags/v}"
+          else
+            APP_VER="${PKG_VER}"
+          fi
+          echo "version=${APP_VER}" >> "$GITHUB_OUTPUT"
+          echo "tag=v${APP_VER}" >> "$GITHUB_OUTPUT"
+          echo "code=${GITHUB_RUN_NUMBER}" >> "$GITHUB_OUTPUT"
+
+      - name: Sync Capacitor Android
+        run: npx cap sync android
+
+      - name: Build signed Android Release APK
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleRelease -PappVersionName="${{ steps.ver.outputs.version }}" -PappVersionCode="${{ steps.ver.outputs.code }}"
+
+      - name: Prepare APK artifact
+        run: |
+          mkdir -p dist
+          cp android/app/build/outputs/apk/release/app-release.apk "dist/AventuraRetro1930-v${{ steps.ver.outputs.version }}.apk"
+
+      - name: Upload APK workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: AventuraRetro1930-v${{ steps.ver.outputs.version }}
+          path: dist/*.apk
+
+      - name: Publish GitHub Release with APK
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.ver.outputs.tag }}
+          name: "¡Aventura Retro 1930! ${{ steps.ver.outputs.tag }}"
+          make_latest: true
+          body: |
+            🎬 **¡Aventura Retro 1930!** para Carlos, Mateo y Ariel (${{ steps.ver.outputs.tag }})
+
+            - Estilo Caricatura Clásica 1930 (Rubber Hose a color a 12 fps y fondos en acuarela vintage)
+            - 3 personajes jugables: Carlos, Mateo y Ariel
+            - 4 mundos explorables: Bosque Encantado, Desierto Dorado, Mares Piratas y Montaña Nevada
+            - Recolección, Mesa de Crafteo (Hacha, Espada, Pico de Cristal, Varita Estelar, Escudo Dorado y Pociones) y 4 jefes cómicos
+            - Tablet Android horizontal inmersivo (1340x800), voz latina natural Android TTS y auto-actualización in-app.
+          files: |
+            dist/AventuraRetro1930-v${{ steps.ver.outputs.version }}.apk

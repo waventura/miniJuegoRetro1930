@@ -1,0 +1,19 @@
+{
+  "name": "aventura-retro-1930",
+  "version": "1.0.0",
+  "description": "¡Aventura Retro 1930! Juego 2D estilo caricatura clásica 1930 (Rubber Hose) para Carlos, Mateo y Ariel",
+  "private": true,
+  "scripts": {
+    "dev": "npx --yes http-server www -p 8080 -c-1",
+    "check": "node -e \"const fs=require('fs'),cp=require('child_process'); for(const f of fs.readdirSync('www/js').filter(x=>x.endsWith('.js'))) cp.execFileSync('node',['--check','www/js/'+f],{stdio:'inherit'}); console.log('JS syntax OK');\"",
+    "cap:sync": "npx cap sync android",
+    "android:build": "npm run cap:sync && cd android && ./gradlew assembleRelease"
+  },
+  "dependencies": {
+    "@capacitor/android": "^6.2.0",
+    "@capacitor/core": "^6.2.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.2.0"
+  }
+}

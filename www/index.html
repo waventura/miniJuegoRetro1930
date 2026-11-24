@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>¡Aventura Retro 1930! — Carlos, Mateo y Ariel</title>
+  <meta name="description" content="Juego infantil 2D estilo Caricatura Clásica 1930 (Rubber Hose a color a 12 fps) con exploración, crafteo y jefes cómicos para Carlos, Mateo y Ariel." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <main class="stage-wrap">
+    <canvas id="gameCanvas" width="1340" height="800" aria-label="Escenario de ¡Aventura Retro 1930!"></canvas>
+
+    <!-- HUD Superior -->
+    <header class="hud-top">
+      <div class="hud-group">
+        <div class="vintage-pill hud-hero-box">
+          <div class="hud-hero-row">
+            <span id="hudCharName">Carlos</span>
+            <span id="hudWeaponBadge">🥊 Guantes Retro</span>
+          </div>
+          <div id="hudHearts">❤️❤️❤️❤️❤️</div>
+        </div>
+
+        <div class="vintage-pill">
+          <span class="res-item">🪵 <b id="hudWood">2</b></span>
+          <span class="res-item">🪨 <b id="hudStone">1</b></span>
+          <span class="res-item">💎 <b id="hudCrystal">0</b></span>
+          <span class="res-item">🏅 <b id="hudMedals">0/4</b></span>
+        </div>
+
+        <div class="vintage-pill">
+          <span id="hudWorldName">🌲 Bosque Encantado</span>
+        </div>
+      </div>
+
+      <div class="hud-group">
+        <button id="btnOpenCraft" class="hud-btn red" title="Mesa de Crafteo (C)">🔨 Craftear</button>
+        <button id="btnOpenMap" class="hud-btn" title="Mapa de Mundos (M)">🗺️ 4 Mundos</button>
+        <button id="btnOpenChars" class="hud-btn icon-only" title="Cambiar Personaje">🎭</button>
+        <button id="btnSound" class="hud-btn icon-only" title="Música y Sonidos">🔊</button>
+        <button id="btnVoice" class="hud-btn icon-only" title="Voz Latina">🗣️</button>
+        <button id="btnOpenUpdate" class="hud-btn icon-only" title="Buscar Actualización">
+          ⬇️<span id="updateDot" class="update-dot hidden"></span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Barra de Vida del Jefe -->
+    <section id="bossBarWrap" class="boss-bar-wrap hidden" aria-live="polite">
+      <div id="bossBarName">👑 Don Tronco Gruñón</div>
+      <div class="boss-bar-track">
+        <div id="bossBarFill"></div>
+      </div>
+    </section>
+
+    <!-- Controles Táctiles Grandes para Tablet Android 1340x800 -->
+    <section class="touch-controls" aria-label="Controles táctiles">
+      <div id="joystickZone" class="joystick-zone">
+        <div id="joystickKnob" class="joystick-knob"></div>
+      </div>
+
+      <div class="action-pad">
+        <button id="btnPotion" class="touch-btn btn-potion" aria-label="Beber Poción">
+          <span id="potionCount" class="potion-badge">1</span>
+          <span class="t-ico">🧪</span>
+          <span class="t-lbl">POCIÓN</span>
+        </button>
+
+        <button id="btnShield" class="touch-btn btn-shield" aria-label="Escudo">
+          <span class="t-ico">🛡️</span>
+          <span class="t-lbl">ESCUDO</span>
+        </button>
+
+        <button id="btnSpecial" class="touch-btn btn-special" aria-label="Especial Estelar">
+          <span class="t-ico">✨</span>
+          <span class="t-lbl">ESPECIAL</span>
+        </button>
+
+        <button id="btnAttack" class="touch-btn btn-attack" aria-label="Atacar y Recolectar">
+          <span class="t-ico">⚔️</span>
+          <span class="t-lbl">ATACAR</span>
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Pantalla de Título y Selección de Personaje -->
+  <div id="titleModal" class="modal-backdrop">
+    <div class="retro-modal">
+      <div class="title-header">
+        <h1>🎬 ¡Aventura Retro 1930! 🎬</h1>
+        <p class="title-sub">Elige a tu héroe caricatura para explorar, crear herramientas y vencer a los 4 jefes cómicos</p>
+      </div>
+
+      <div class="char-grid">
+        <div class="char-card selected" data-char="carlos">
+          <canvas id="prevCarlos" width="150" height="150"></canvas>
+          <h3>Carlos</h3>
+          <div class="char-role">Explorador Valiente</div>
+          <div class="char-perk">+15% fuerza con Espada y Hacha</div>
+        </div>
+
+        <div class="char-card" data-char="mateo">
+          <canvas id="prevMateo" width="150" height="150"></canvas>
+          <h3>Mateo</h3>
+          <div class="char-role">Inventor Veloz</div>
+          <div class="char-perk">+15% velocidad y recolección rápida</div>
+        </div>
+
+        <div class="char-card" data-char="ariel">
+          <canvas id="prevAriel" width="150" height="150"></canvas>
+          <h3>Ariel</h3>
+          <div class="char-role">Estrella Mágica</div>
+          <div class="char-perk">+20% poder con Varita y +1 ❤️</div>
+        </div>
+      </div>
+
+      <div class="title-footer">
+        <span id="versionLabel" style="font-weight:800; color:#5a4332;">v1.0.0</span>
+        <button id="btnPlayStart" class="retro-btn">▶ ¡A JUGAR!</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mesa de Creación (Crafteo) -->
+  <div id="craftModal" class="modal-backdrop hidden">
+    <div class="retro-modal">
+      <div class="modal-header">
+        <h2>🔨 Mesa de Creación Retro 1930</h2>
+        <button id="btnCloseCraft" class="retro-btn small alt">CERRAR ✕</button>
+      </div>
+      <div id="craftResSummary" class="craft-res-bar"></div>
+      <div id="craftGrid" class="craft-grid"></div>
+    </div>
+  </div>
+
+  <!-- Selector de 4 Mundos -->
+  <div id="mapModal" class="modal-backdrop hidden">
+    <div class="retro-modal">
+      <div class="modal-header">
+        <h2>🗺️ Elige un Mundo para Explorar</h2>
+        <button id="btnCloseMap" class="retro-btn small alt">CERRAR ✕</button>
+      </div>
+      <div id="mapGrid" class="map-grid"></div>
+    </div>
+  </div>
+
+  <!-- Banner de Victoria de Jefe -->
+  <div id="victoryBanner" class="modal-backdrop hidden">
+    <div class="retro-modal compact">
+      <h2 style="font-size:32px; color:#c94038; margin:0 0 10px;">🏆 ¡VICTORIA CARICATURA! 🏆</h2>
+      <p id="victoryText" style="font-size:18px; font-weight:700; margin:0 0 18px;"></p>
+      <button id="btnCloseVictory" class="retro-btn">¡SEGUIR EXPLORANDO!</button>
+    </div>
+  </div>
+
+  <!-- Modal de Auto-Actualización In-App -->
+  <div id="updateModal" class="modal-backdrop hidden">
+    <div class="retro-modal compact">
+      <div class="modal-header">
+        <h2>⬇️ Actualización In-App</h2>
+        <button id="btnCloseUpdate" class="retro-btn small alt">✕</button>
+      </div>
+      <p id="updateStatus" style="font-weight:800; font-size:17px;"></p>
+      <div id="updateNotes" class="update-notes"></div>
+      <div id="updateProgressWrap" class="progress-track hidden">
+        <div id="updateProgressFill"></div>
+      </div>
+      <div style="display:flex; gap:10px; justify-content:center; margin-top:12px;">
+        <button id="btnCheckNow" class="retro-btn small alt">🔄 Buscar Ahora</button>
+        <button id="btnDownloadUpdate" class="retro-btn small hidden">📲 Actualizar APK</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/game.js"></script>
+</body>
+</html>

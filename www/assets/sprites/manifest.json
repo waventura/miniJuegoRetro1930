@@ -1,0 +1,23 @@
+{
+  "description": "Manifiesto de Sprite Sheets PNG 512x512 (cuadrícula 4x4 de 128x128 px a 12 fps) para ¡Aventura Retro 1930!. Coloca los archivos PNG aquí para reemplazar automáticamente el renderizado vectorial Rubber Hose.",
+  "sheetSize": 512,
+  "cols": 4,
+  "rows": 4,
+  "frameSize": 128,
+  "fps": 12,
+  "rowLayout": {
+    "0": "idle",
+    "1": "walk",
+    "2": "attack",
+    "3": "cheer_or_hurt"
+  },
+  "sprites": {
+    "carlos": "assets/sprites/carlos.png",
+    "mateo": "assets/sprites/mateo.png",
+    "ariel": "assets/sprites/ariel.png",
+    "boss_bosque": "assets/sprites/boss_bosque.png",
+    "boss_desierto": "assets/sprites/boss_desierto.png",
+    "boss_pirata": "assets/sprites/boss_pirata.png",
+    "boss_montana": "assets/sprites/boss_montana.png"
+  }
+}
